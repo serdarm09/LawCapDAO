@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Belirli bir tarihe geri sayım için
-const endDate = new Date('2025-01-07T11:14:46'); // 7 Ocak 2025, 11:35
+const endDate = new Date('2025-01-07T11:14:49'); // 7 Ocak 2025, 11:35
 
 function updateCountdown() {
     const now = new Date();
