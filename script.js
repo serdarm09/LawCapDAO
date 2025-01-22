@@ -193,4 +193,18 @@ window.addEventListener('scroll', () => {
     const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
     const progress = window.scrollY / windowHeight;
     scrollProgress.style.transform = `scaleX(${progress})`;
+});
+
+// Progress bar animation
+function animateProgressBar() {
+    const progressBar = document.querySelector('.progress-fill');
+    if (progressBar) {
+        const progress = progressBar.getAttribute('data-progress');
+        progressBar.style.width = progress + '%';
+    }
+}
+
+// DOM yüklendiğinde progress bar'ı başlat
+document.addEventListener('DOMContentLoaded', () => {
+    animateProgressBar();
 }); 
