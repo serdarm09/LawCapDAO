@@ -32,38 +32,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Geri sayım tarihini güncelle
-const endDate = new Date(); // Şimdiki zaman
+// Geri sayım için süre ayarla
+const endDate = new Date();
 endDate.setDate(endDate.getDate() + 1); // 1 gün ekle
-endDate.setHours(endDate.getHours() + 3); // 3 saat ekle
-endDate.setMinutes(endDate.getMinutes() + 24); // 24 dakika ekle
-endDate.setSeconds(endDate.getSeconds() + 1); // 1 saniye ekle
+endDate.setHours(endDate.getHours() + 2); // 2 saat ekle
+endDate.setMinutes(endDate.getMinutes() + 30); // 30 dakika ekle
+endDate.setSeconds(endDate.getSeconds() + 2); // 2 saniye ekle
 
 function updateCountdown() {
     const now = new Date();
-    const difference = endDate - now;
+    const distance = endDate - now;
 
-    if (difference <= 0) {
-        // Süre dolduğunda yapılacak işlemler
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // İki haneli format için
+    document.getElementById('days').innerHTML = days < 10 ? "0" + days : days;
+    document.getElementById('hours').innerHTML = hours < 10 ? "0" + hours : hours;
+    document.getElementById('minutes').innerHTML = minutes < 10 ? "0" + minutes : minutes;
+    document.getElementById('seconds').innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
+    if (distance < 0) {
+        clearInterval(countdownTimer);
         document.querySelector('.countdown').innerHTML = '<h3>Launch Time!</h3>';
-        return;
     }
-
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-    document.getElementById('days').textContent = days.toString().padStart(2, '0');
-    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
 }
 
-// Her saniye güncelle
-setInterval(updateCountdown, 1000);
-// Sayfa yüklendiğinde ilk güncelleme
+// İlk çalıştırma
 updateCountdown();
+
+// Her saniye güncelle
+const countdownTimer = setInterval(updateCountdown, 1000);
 
 // Yeni özellik: Paralaks efekti
 window.addEventListener('scroll', () => {
@@ -96,11 +97,6 @@ function animateNumbers() {
     });
 }
 
-// Sayfa yüklendiğinde animasyonları başlat
-document.addEventListener('DOMContentLoaded', () => {
-    animateNumbers();
-});
-
 // Scroll efekti için nav kontrolü
 window.addEventListener('scroll', () => {
     const nav = document.querySelector('nav');
@@ -111,75 +107,69 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Loading Screen
-window.addEventListener('load', () => {
-    const loader = document.querySelector('.loader');
-    setTimeout(() => {
-        loader.style.opacity = '0';
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500);
-    }, 2000);
-});
-
-// Scroll to top
-const scrollTop = document.querySelector('.scroll-top');
-window.addEventListener('scroll', () => {
-    if (window.pageYOffset > 200) {
-        scrollTop.classList.add('visible');
-    } else {
-        scrollTop.classList.remove('visible');
-    }
-});
-
-scrollTop.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-});
-
-// Intersection Observer for animations
-const observerOptions = {
-    threshold: 0.5
-};
-
+// Observer tanımı tek bir yerde olmalı
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('animate');
-        }
-    });
-}, observerOptions);
-
-document.querySelectorAll('.timeline-item').forEach(item => {
-    observer.observe(item);
-});
-
-// Fade-in animasyonu için
-function handleIntersection(entries, observer) {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
             entry.target.classList.add('visible');
             observer.unobserve(entry.target);
         }
     });
-}
+}, { threshold: 0.5 });
 
-const observer = new IntersectionObserver(handleIntersection, {
-    threshold: 0.1
-});
-
+// DOM elementlerini kontrol ederek kullan
 document.addEventListener('DOMContentLoaded', () => {
-    // Fade-in elementlerini seç
-    const elements = document.querySelectorAll('.fade-in');
-    elements.forEach(el => observer.observe(el));
+    // Timeline elementleri
+    document.querySelectorAll('.timeline-item').forEach(item => {
+        observer.observe(item);
+    });
+
+    // Fade-in elementleri
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
     
-    // Başlıklara animasyon class'ı ekle
+    // Başlıklar
     document.querySelectorAll('h1, h2, h3').forEach(heading => {
         heading.classList.add('animate-text');
     });
+
+    // Sayaç animasyonu (tek sefer çağır)
+    animateNumbers();
 });
+
+// Loading Screen - element kontrolü ekle
+window.addEventListener('load', () => {
+    const loader = document.querySelector('.loader');
+    if (loader) {
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }, 2000);
+    }
+});
+
+// Scroll to top - element kontrolü ekle
+const scrollTop = document.querySelector('.scroll-top');
+if (scrollTop) {
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 200) {
+            scrollTop.classList.add('visible');
+        } else {
+            scrollTop.classList.remove('visible');
+        }
+    });
+
+    scrollTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 
 // Mouse hareket efekti
 document.addEventListener('mousemove', (e) => {
